@@ -28,14 +28,14 @@ public class Console {
         System.out.println("\n---MENIU---");
         System.out.println("1. Adauga utilizator");
         System.out.println("2. Sterge utilizator");
-        System.out.println("3. Afișeaza toți utilizatorii");
+        System.out.println("3. Afiseaza toti utilizatorii");
         System.out.println("4. Adauga prietenie");
         System.out.println("5. Sterge prietenie");
-        System.out.println("6. Afișeaza toate prieteniile");
+        System.out.println("6. Afiseaza toate prieteniile");
         System.out.println("7. Afisare numar de comunitati");
         System.out.println("8. Afisare cea mai sociabila comunitate");
         System.out.println("0. Exit");
-        System.out.print("Alege o opțiune: ");
+        System.out.print("Alege o optiune: ");
     }
 
     public void run(){

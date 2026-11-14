@@ -1,11 +1,6 @@
 package Factory;
 
-import Repository.PrietenieFileRepository;
-import Repository.UtilizatorDbRepository;
-import Repository.PrietenieDbRepository;
-import Repository.UtilizatorFileRepository;
-import Repository.InMemoryRepository;
-import Repository.Repository;
+import Repository.*;
 import domain.Prietenie;
 import domain.Tuple;
 import domain.Utilizator;

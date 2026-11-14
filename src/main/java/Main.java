@@ -14,7 +14,12 @@ public class Main{
         try {
             Validator<Utilizator> utilizatorValidator = new UtilizatorValidator();
             Validator<Prietenie> prietenieValidator = new PrietenieValidator();
-
+            Validator<Utilizator> validatorNou = u->{
+                if (u.getNume().length() < 3){
+                    throw new ValidationException("Nume prea scurt");
+                }
+            };
+            Validator<Utilizator> finalValidator = utilizatorValidator.andThen(validatorNou);
             RepositoryFactory factory = new RepositoryFactory();
 
             Repository<Integer, Utilizator> repoUtilizatori = factory.createUtilizatorRepository(utilizatorValidator);

@@ -5,7 +5,6 @@ import domain.Utilizator;
 import java.util.*;
 import java.util.stream.StreamSupport;
 
-
 public class ComunitateService {
     private UtilizatorService utilizatorService;
 
