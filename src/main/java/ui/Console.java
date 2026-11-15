@@ -91,8 +91,8 @@ public class Console {
         String nume = scanner.nextLine();
         System.out.println("Prenume: ");
         String prenume = scanner.nextLine();
-        utilizatorService.addUtilizator(nume, prenume);
-        System.out.println("Utilizator adaugat cu succes!");
+        Utilizator salvat = utilizatorService.addUtilizator(nume, prenume);
+        System.out.println("Utilizator adaugat cu succes! ID generat:" +  salvat.getId());
     }
 
     private void removeUtilizator(){

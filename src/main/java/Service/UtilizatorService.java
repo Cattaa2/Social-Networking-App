@@ -18,13 +18,12 @@ public class UtilizatorService {
         this.repoPrietenii = repoPrietenii;
     }
 
-    public void addUtilizator(String nume, String prenume){
-        int maxID = StreamSupport.stream(repoUtilizatori.findAll().spliterator(),false).mapToInt(Utilizator::getId).max().orElse(0);
-        int currentId = maxID + 1;
-        Utilizator u = new Utilizator(currentId,nume,prenume);
+    public Utilizator addUtilizator(String nume, String prenume){
+        Utilizator u = new Utilizator(prenume,nume);
         if(repoUtilizatori.save(u) != null){
             throw new ServiceException("Utilizatorul exista deja!");
         }
+        return u;
     }
 
     public void removeUtilizator(int id){

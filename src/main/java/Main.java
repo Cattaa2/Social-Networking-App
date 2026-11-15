@@ -22,7 +22,7 @@ public class Main{
             Validator<Utilizator> finalValidator = utilizatorValidator.andThen(validatorNou);
             RepositoryFactory factory = new RepositoryFactory();
 
-            Repository<Integer, Utilizator> repoUtilizatori = factory.createUtilizatorRepository(utilizatorValidator);
+            Repository<Integer, Utilizator> repoUtilizatori = factory.createUtilizatorRepository(finalValidator);
             Repository<Tuple<Integer, Integer>, Prietenie> repoPrietenii = factory.createPrietenieRepository(prietenieValidator);
 
             UtilizatorService serviceUtilizator = new UtilizatorService(repoUtilizatori, repoPrietenii);

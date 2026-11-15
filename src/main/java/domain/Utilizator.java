@@ -27,6 +27,11 @@ public class Utilizator extends Entity<Integer> {
         this.prenume = prenume;
     }
 
+    public Utilizator(String prenume, String nume) {
+        this.prenume = prenume;
+        this.nume = nume;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;

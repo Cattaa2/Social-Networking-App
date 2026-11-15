@@ -6,7 +6,7 @@ public class UtilizatorValidator implements Validator<Utilizator> {
 
     @Override
     public void validate(Utilizator entity) throws ValidationException {
-        if(entity.getId() <=0){
+        if(entity.getId() != null && entity.getId() <=0){
             throw new ValidationException("Id invalid");
         }
         if(entity.getNume() == null || entity.getNume().isEmpty()){

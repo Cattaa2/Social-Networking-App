@@ -35,6 +35,16 @@ public class InMemoryRepository<ID, E extends Entity<ID>> implements Repository<
             throw new IllegalArgumentException("Entitatea nu poate fi null");
         }
         validator.validate(entity);
+
+        if (entity.getId() == null) {
+            int maxId = entities.keySet().stream()
+                    .filter(Integer.class::isInstance)
+                    .mapToInt(id -> (Integer) id)
+                    .max()
+                    .orElse(0);
+            entity.setId((ID) Integer.valueOf(maxId + 1));
+        }
+
         if(entities.containsKey(entity.getId())){
             return entity;
         }
