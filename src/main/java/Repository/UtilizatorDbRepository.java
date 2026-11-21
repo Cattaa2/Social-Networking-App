@@ -3,13 +3,15 @@ package Repository;
 import domain.Utilizator;
 import domain.Validator;
 import exceptions.RepoException;
+import util.paging.Page;
+import util.paging.Pageable;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class UtilizatorDbRepository implements Repository<Integer, Utilizator> {
+public class UtilizatorDbRepository implements PagingRepository<Integer, Utilizator> {
     private Validator<Utilizator> validator;
     private String url;
     private String user;
@@ -194,6 +196,42 @@ public class UtilizatorDbRepository implements Repository<Integer, Utilizator> {
             return Optional.of(entity);
         } catch (SQLException e) {
             throw new RepoException("Eroare la DB (update user): " + e.getMessage());
+        }
+    }
+
+    @Override
+    public Page<Utilizator> findAllOnPage(Pageable pageable) {
+        if(pageable == null) {
+            throw new IllegalArgumentException("Pageable nu poate fi null!");
+        }
+
+        List<Utilizator> users = new ArrayList<>();
+        String countSql = "SELECT COUNT(*) AS count FROM users";
+        String pageSql = "SELECT id, first_name, last_name FROM users ORDER BY id LIMIT ? OFFSET ?";
+        try (Connection connection = DriverManager.getConnection(url, user, password)){
+            int totalCount = 0;
+            try(PreparedStatement countStmt = connection.prepareStatement(countSql);
+                ResultSet countRs = countStmt.executeQuery()){
+                if(countRs.next()){
+                    totalCount = countRs.getInt("count");
+                }
+            }
+
+            try(PreparedStatement pageStmt = connection.prepareStatement(pageSql)){
+                pageStmt.setInt(1, pageable.getPageSize());
+                pageStmt.setInt(2, pageable.getPageNumber() *  pageable.getPageSize());
+                try(ResultSet rs = pageStmt.executeQuery()){
+                    while (rs.next()){
+                        int id = rs.getInt("id");
+                        String firstName = rs.getString("first_name");
+                        String lastName = rs.getString("last_name");
+                        users.add(new Utilizator(id, firstName, lastName));
+                    }
+                }
+            }
+            return new Page<>(users,totalCount);
+        } catch(SQLException e) {
+            throw new RepoException("Eroare la DB (findAllOnPage users): " + e.getMessage());
         }
     }
 }

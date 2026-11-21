@@ -29,7 +29,8 @@ public class Main{
             PrietenieService servicePrietenii = new PrietenieService(repoPrietenii, repoUtilizatori);
             ComunitateService comunitateService = new ComunitateService(serviceUtilizator);
 
-            Console console = new Console(serviceUtilizator, servicePrietenii, comunitateService);
+            int pageSize = factory.getPageSize();
+            Console console = new Console(serviceUtilizator, servicePrietenii, comunitateService,  pageSize);
 
             console.run();
         }catch(RepoException | ValidationException | ServiceException | IllegalArgumentException | UnsupportedOperationException e) {

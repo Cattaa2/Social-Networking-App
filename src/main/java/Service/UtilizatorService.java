@@ -1,10 +1,13 @@
 package Service;
 
 import Repository.Repository;
+import Repository.PagingRepository;
 import domain.Prietenie;
 import domain.Tuple;
 import domain.Utilizator;
 import exceptions.ServiceException;
+import util.paging.Page;
+import util.paging.Pageable;
 
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -39,5 +42,19 @@ public class UtilizatorService {
 
     public Iterable<Utilizator> getAllUtilizatori(){
         return repoUtilizatori.findAll();
+    }
+
+    /**
+     * Retrieves a page of users. Works only with database repo
+     *
+     * @param pageable the pagination parameters
+     * @return a Page of users
+     * @throws UnsupportedOperationException if the repository is not database
+     */
+    public Page<Utilizator> getUtilizatoriOnPage(Pageable pageable){
+        if(repoUtilizatori instanceof PagingRepository<Integer, Utilizator> pagingRepo){
+            return pagingRepo.findAllOnPage(pageable);
+        }
+        throw new UnsupportedOperationException("Paginarea functioneaza doar pentru database");
     }
 }

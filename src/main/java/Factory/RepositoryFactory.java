@@ -77,4 +77,7 @@ public class RepositoryFactory {
         if(strategieAleasa == null) throw new  RepoException("Repository type invalid");
         return strategieAleasa.apply(validator);
     }
+    public int getPageSize() {
+        return Integer.parseInt(properties.getProperty("page.size", "2"));
+    }
 }

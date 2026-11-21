@@ -1,10 +1,13 @@
 package Service;
 
 import Repository.Repository;
+import Repository.PrietenieDbRepository;
 import domain.Prietenie;
 import domain.Tuple;
 import domain.Utilizator;
 import exceptions.ServiceException;
+import util.paging.Page;
+import util.paging.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -62,5 +65,23 @@ public class PrietenieService {
 
     public Iterable<Prietenie> getAllPrietenii() {
         return repoPrietenii.findAll();
+    }
+
+    /**
+     * Retrieves a page of friends for a user
+     *
+     * @param userId the id of the user
+     * @param pageable the page parameters
+     * @return a Page of friends
+     * @throws ServiceException if the user doesn't exist
+     * @throws UnsupportedOperationException if the repository is not database
+     */
+    public Page<Utilizator> getFriendsOnPage(int userId, Pageable pageable){
+        repoUtilizatori.findOne(userId)
+                .orElseThrow(() -> new ServiceException("Utilizatorul cu id " + userId + " nu exista!"));
+        if(repoPrietenii instanceof PrietenieDbRepository dbRepo){
+            return dbRepo.findFriendsOnPage(userId, pageable);
+        }
+        throw new UnsupportedOperationException("Paginarea functioneaza doar pt database");
     }
 }

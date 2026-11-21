@@ -8,19 +8,24 @@ import domain.Utilizator;
 import exceptions.RepoException;
 import exceptions.ServiceException;
 import exceptions.ValidationException;
+import util.paging.Page;
+import util.paging.Pageable;
 
 import java.util.Scanner;
+import java.util.function.Function;
 
 public class Console {
     private UtilizatorService utilizatorService;
     private PrietenieService prietenieService;
     private ComunitateService comunitateService;
     private Scanner scanner;
+    private int pageSize;
 
-    public Console(UtilizatorService utilizatorService, PrietenieService prietenieService, ComunitateService comunitateService) {
+    public Console(UtilizatorService utilizatorService, PrietenieService prietenieService, ComunitateService comunitateService, int pageSize) {
         this.utilizatorService = utilizatorService;
         this.prietenieService = prietenieService;
         this.comunitateService = comunitateService;
+        this.pageSize = pageSize;
         this.scanner = new Scanner(System.in);
     }
 
@@ -34,6 +39,8 @@ public class Console {
         System.out.println("6. Afiseaza toate prieteniile");
         System.out.println("7. Afisare numar de comunitati");
         System.out.println("8. Afisare cea mai sociabila comunitate");
+        System.out.println("9. Afiseaza utilizatorii (paginat)");
+        System.out.println("10. Afiseaza prietenii unui user (paginat)");
         System.out.println("0. Exit");
         System.out.print("Alege o optiune: ");
     }
@@ -70,6 +77,12 @@ public class Console {
                         for (Utilizator u : comunitateService.ceaMaiSociabilaComunitate()) {
                             System.out.println(u.toString());
                         }
+                        break;
+                    case "9":
+                        showAllUtilizatoriPaginat();
+                        break;
+                    case "10":
+                        showFriendsPaginat();
                         break;
                     case "0":
                         System.out.println("bye!");
@@ -131,4 +144,74 @@ public class Console {
             System.out.println(p.toString());
         }
     }
+
+    private void showAllUtilizatoriPaginat(){
+        int pageNumber = 0;
+        while (true) {
+            Page<Utilizator> page = utilizatorService.getUtilizatoriOnPage(new Pageable(pageNumber, pageSize));
+            int totalPages = (page.getTotalNumberOfElements() + pageSize - 1) / pageSize;
+            if(totalPages == 0){
+                System.out.println("Nu exista utilizatori!");
+                return;
+            }
+            System.out.println("Pagina " + (pageNumber + 1) + "/" + totalPages + ":");
+            page.getElementsOnPage().forEach(u -> System.out.println(" " + u));
+            System.out.print("[n]ext, [p]revious, [q]uit: ");
+            switch(scanner.nextLine().trim().toLowerCase()) {
+                case "n" ->{
+                    if (pageNumber + 1 < totalPages) {
+                        pageNumber++;
+                    }else{
+                        System.out.println("Esti pe ultima pagina!");
+                    }
+                }
+                case "p" ->{
+                    if (pageNumber > 0){
+                        pageNumber--;
+                    }else{
+                        System.out.println("Esti pe prima pagina!");
+                    }
+                }
+                case "q" ->{ return; }
+                default -> System.out.println("Optiune invalida!");
+            }
+        }
+    }
+
+    private void showFriendsPaginat(){
+        System.out.println("ID utilizator: ");
+        int userId = Integer.parseInt(scanner.nextLine());
+        int pageNumber = 0;
+        while (true) {
+            Page<Utilizator> page = prietenieService.getFriendsOnPage(userId, new Pageable(pageNumber, pageSize));
+            int totalPages = (page.getTotalNumberOfElements() + pageSize - 1) / pageSize;
+            if(totalPages == 0){
+                System.out.println("Utilizatorul nu are prieteni!");
+                return;
+            }
+            System.out.println("Prieteni - Pagina " + (pageNumber + 1) + "/" + totalPages + ":");
+            page.getElementsOnPage().forEach(u -> System.out.println(" " + u));
+
+            System.out.print("[n]ext, [p]revious, [q]uit: ");
+            switch(scanner.nextLine().trim().toLowerCase()) {
+                case "n" ->{
+                    if (pageNumber + 1 < totalPages) {
+                        pageNumber++;
+                    }else{
+                        System.out.println("Esti pe ultima pagina!");
+                    }
+                }
+                case "p" ->{
+                    if (pageNumber > 0){
+                        pageNumber--;
+                    }else{
+                        System.out.println("Esti pe prima pagina!");
+                    }
+                }
+                case "q" ->{ return; }
+                default -> System.out.println("Optiune invalida!");
+            }
+        }
+    }
+
 }

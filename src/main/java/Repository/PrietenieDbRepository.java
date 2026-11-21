@@ -2,8 +2,11 @@ package Repository;
 
 import domain.Prietenie;
 import domain.Tuple;
+import domain.Utilizator;
 import domain.Validator;
 import exceptions.RepoException;
+import util.paging.Page;
+import util.paging.Pageable;
 
 import java.net.ConnectException;
 import java.sql.*;
@@ -194,6 +197,54 @@ public class PrietenieDbRepository implements Repository<Tuple<Integer,Integer>,
             return  Optional.of(entity);
         } catch (SQLException e) {
             throw new RepoException("Eroare la DB (update friendships):" + e.getMessage());
+        }
+    }
+
+    public Page<Utilizator> findFriendsOnPage(Integer userId, Pageable pageable) {
+        if(userId == null) {
+            throw new  IllegalArgumentException("ID-ul utilizatorului nu poate fi null!");
+        }
+        if(pageable == null) {
+            throw new IllegalArgumentException("Pageable nu poate fi null!");
+        }
+        List<Utilizator> friends = new ArrayList<>();
+        String countSql = "SELECT COUNT(*) AS count FROM friendships WHERE id1 = ? OR id2 = ?";
+        String pageSql = "SELECT u.id, u.first_name, u.last_name FROM friendships f " +
+                         "JOIN users u ON (u.id = f.id1 OR u.id = f.id2) " +
+                         "WHERE (f.id1 = ? or f.id2 = ?) AND u.id <> ? " +
+                         "ORDER BY u.id LIMIT ? OFFSET ?";
+
+        try(Connection connection = DriverManager.getConnection(url,user,password)){
+            int totalCount = 0;
+            try(PreparedStatement countStmt = connection.prepareStatement(countSql)){
+                countStmt.setInt(1, userId);
+                countStmt.setInt(2, userId);
+                try(ResultSet countRs = countStmt.executeQuery()){
+                    if(countRs.next()) {
+                        totalCount = countRs.getInt("count");
+                    }
+                }
+            }
+
+            try(PreparedStatement pageStmt = connection.prepareStatement(pageSql)){
+                pageStmt.setInt(1, userId);
+                pageStmt.setInt(2, userId);
+                pageStmt.setInt(3, userId);
+                pageStmt.setInt(4, pageable.getPageSize());
+                pageStmt.setInt(5, pageable.getPageNumber() *  pageable.getPageSize());
+
+                try(ResultSet pageRs = pageStmt.executeQuery()){
+                    while(pageRs.next()){
+                        int id = pageRs.getInt("id");
+                        String firstName = pageRs.getString("first_name");
+                        String lastName = pageRs.getString("last_name");
+                        friends.add(new Utilizator(id, firstName, lastName));
+                    }
+                }
+            }
+            return new Page<>(friends, totalCount);
+        } catch (SQLException e) {
+            throw new RepoException("Eroare la DB (findFriendsOnPage):" + e.getMessage());
         }
     }
 }
